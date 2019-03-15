@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="container">
+		<input type="text" disabled id="displayTop" value="">	
+		<input type="text" disabled id="display" value="00000">
+
+		<div id="row1" class="row_block">
+			<button id="btn_clear" value="c" class="btn btn_clear">c</button>
+			<button id="btn/" value="/" class="btn btn_operation" >/</button>
+			<button id="btn*" value="*" class="btn btn_operation" >*</button>
+			<button id="btn_delete" value="del" class="btn btn_delete">del</button>
+		</div>
+
+		<div id="row2" class="row_block">
+			<button id="btn1" value="1" class="btn btn_number" >1</button>
+			<button id="btn2" value="2" class="btn btn_number" >2</button>
+			<button id="btn3" value="3" class="btn btn_number" >3</button>
+			<button id="btn-" value="-" class="btn btn_operation">-</button>
+		</div>
+		
+		<div id="row3" class="row_block">
+			<button id="btn4" value="4" class="btn btn_number" >4</button>
+			<button id="btn5" value="5" class="btn btn_number" >5</button>
+			<button id="btn6" value="6" class="btn btn_number" >6</button>
+			<button id="btn+" value="+" class="btn btn_operation">+</button>
+		</div>
+
+		<div id="row4" class="row_block" >
+			<button id="btn7" value="7" class="btn btn_number" >7</button>
+			<button id="btn8" value="8" class="btn btn_number" >8</button>
+			<button id="btn9" value="9" class="btn btn_number" >9</button>
+		</div>
+
+		<div id="row_result">
+		<button id="btn_result" value="=" class="btn btn_result">=</button>
+		</div>
+
+		<div id="row5" class="row_block">
+			<button id="btn%" value="%" class="btn btn_operation">%</button>
+			<button id="btn0" value="0" class="btn btn_number" >0</button>
+			<button id="btn_point" value="." class="btn btn_number" >.</button>
+		</div>
+	</div>
+</body>
+	<script>
+		//var arr = ["1", "+", "2", "*", "3", "/", "6"];
+		//var arr = ["1", "+", "2", "/", "2", "*", "3", "-", "2"];
+		//console.log(arr);
+		//console.log(arr.length);
+
+		var symbols = [""]; //массив вводимых значений
+		var container = document.getElementById("container");
+		var display = document.getElementById("display");
+		var displayTop = document.getElementById("displayTop");
+		var countSymbols = 0; //счетчик вводимых значений, отсчитывается по нажатым операциям
+		var memoryNewCycle = false;
+		container.addEventListener("click", function(e){
+			if (e.target.classList.contains("btn")){
+				btnPress(e);
+			}
+		});
+
+		console.log("Длина массива " + symbols.length);
+
+		function btnPress(e){
+			//console.log(e.target.textContent); 
+			if (symbols[countSymbols] === undefined){
+					symbols[countSymbols] = "";
+				}
+			switch (e.target.className){
+
+				case "btn btn_number":
+				if (memoryNewCycle){
+						symbols[countSymbols] = "";
+						display.value = "";
+					}
+				symbols[countSymbols] += e.target.value;
+				memoryNewCycle = false;
+				display.value = symbols.join("");
+				break;
+
+				case "btn btn_operation":
+					++countSymbols;
+					symbols[countSymbols] = e.target.textContent;
+					++countSymbols;
+					memoryNewCycle = false;
+					display.value = symbols.join("");
+				break;
+
+				case "btn btn_clear":
+					symbols = [""];
+					countSymbols = 0;
+					display.value = "";
+					displayTop.value = "";
+				break;
+
+				case "btn btn_delete":
+		
+					if (symbols[countSymbols] === "+" || symbols[countSymbols] === "-" || symbols[countSymbols] === "*" || symbols[countSymbols] === "/"){
+						symbols.pop();
+						console.log(symbols);
+						--countSymbols;
+					} else {
+						let afterDel = symbols[countSymbols].substring(0, symbols[countSymbols].length - 1);
+						symbols[countSymbols] = afterDel;
+						console.log(afterDel);
+						if (symbols[countSymbols] === ""){
+						symbols.pop();
+						console.log("Элемент полностью удален" + symbols.length);
+						--countSymbols;
+					 }
+					}
+				break;
+
+				case "btn btn_result":
+					result(symbols);
+					countSymbols = 0;
+					memoryNewCycle = true;
+				break;
+			}
+		};
+
+/*
+			if(e.target.textContent !== "="){
+				if (symbols[countSymbols] === undefined){
+					symbols[countSymbols] = "";
+				}
+				if (e.target.classList.contains("btn_number")){
+					if (memoryNewCycle === true){
+						symbols[countSymbols] = "";
+						display.value = "";
+					}
+					console.log("Нажата цифра")
+					symbols[countSymbols] += e.target.textContent;
+				}
+				if (e.target.classList.contains("btn_operation")){
+					++countSymbols;
+					symbols[countSymbols] = e.target.textContent;
+					++countSymbols;
+					memoryNewCycle = false;
+				}
+				
+				display.value = symbols.join("");
+			} else{
+				result(symbols);
+				countSymbols = 0;
+				memoryNewCycle = true;
+			}
+		};
+*/
+
+			/*if (e.target.classList.contains("btn_clear")){
+					symbols = [""];
+					countSymbols = 0;
+					displayTop.value = "";
+				}*/
+
+
+
+		function result(arr){
+		displayTop.value = arr.join("");
+		for (var i = 0; i < arr.length; i++){
+			let x;
+			if (arr[i] === "*" || arr[i] === "/"){
+				if(arr[i] === "*"){
+					x = parseFloat(arr[i-1], 10) * parseFloat(arr[i+1], 10);
+				} else{
+					x = parseFloat(arr[i-1], 10) / parseFloat(arr[i+1], 10);
+				}
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				--i;
+				console.log(arr);
+			}
+		}
+
+		for (var i = 0; i < arr.length; i++){
+			let x;
+			if (arr[i] === "+" || arr[i] === "-"){
+				if(arr[i] === "+"){
+					x = parseFloat(arr[i-1], 10) + parseFloat(arr[i+1], 10);
+				} else{
+					x = parseFloat(arr[i-1], 10) - parseFloat(arr[i+1], 10);
+				}
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				--i;
+				console.log(arr);
+			}
+		} 
+	display.value = "=" + arr;	
+	};
+
+		/* if (arr[i] === "*"){
+				let x = parseFloat(arr[i-1], 10) * parseFloat(arr[i+1], 10);
+				console.log("Результат умножения " + x);
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				console.log("После умножения " + arr);
+				console.log(arr.length);
+				--i;
+			}
+
+			if (arr[i] === "/"){
+				let x = parseFloat(arr[i-1], 10) / parseFloat(arr[i+1], 10);
+				console.log("результат деления " + x);
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				console.log("После деления " + arr);
+				console.log(arr.length);
+				--i;
+			}
+*/
+		/*
+			if (arr[i] === "+"){
+				let x = parseFloat(arr[i-1], 10) + parseFloat(arr[i+1], 10);
+				console.log("результат сложния" + x);
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				console.log("После сложения " + arr);
+				console.log(arr.length);
+				--i;
+			}
+			if (arr[i] === "-"){
+				let x = parseFloat(arr[i-1], 10) - parseFloat(arr[i+1], 10);
+				console.log("результат вычитания" + x);
+				arr[i-1] = x;
+				arr.splice(i, 2);
+				console.log("После вычитания" + arr);
+				console.log(arr.length);
+				--i;
+			}*/
+	</script>
+</html>
+
+
+
+
